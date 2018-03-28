@@ -147,6 +147,7 @@ var generateSplash = function (platform, splash) {
   var deferred = Q.defer();
   var srcPath = 'splash-' + platform.name + '.png'
   if (!fs.existsSync(platformPath)) {
+		display.error(srcPath + " not found")
 		deferred.resolve()
 		return
   }
