@@ -12,7 +12,6 @@ var argv   = require('minimist')(process.argv.slice(2));
  */
 var settings = {};
 settings.CONFIG_FILE = argv.config || 'config.xml';
-settings.SPLASH_FILE = argv.splash || 'splash.png';
 settings.OLD_XCODE_PATH = argv['xcode-old'] || false;
 
 /**
@@ -146,10 +145,10 @@ var getProjectName = function () {
  */
 var generateSplash = function (platform, splash) {
   var deferred = Q.defer();
-  var srcPath = settings.SPLASH_FILE;
-  var platformPath = srcPath.replace(/\.png$/, '-' + platform.name + '.png');
-  if (fs.existsSync(platformPath)) {
-    srcPath = platformPath;
+  var srcPath = 'splash-' + platform.name + '.png'
+  if (!fs.existsSync(platformPath)) {
+		deferred.resolve()
+		return
   }
   var dstPath = platform.splashPath + splash.name;
   var dst = path.dirname(dstPath);
@@ -242,56 +241,17 @@ var atLeastOnePlatformFound = function () {
   return deferred.promise;
 };
 
-/**
- * Checks if a valid splash file exists
- *
- * @return {Promise} resolves if exists, rejects otherwise
- */
-var validSplashExists = function () {
-  var deferred = Q.defer();
-  fs.exists(settings.SPLASH_FILE, function (exists) {
-    if (exists) {
-      display.success(settings.SPLASH_FILE + ' exists');
-      deferred.resolve();
-    } else {
-      display.error(settings.SPLASH_FILE + ' does not exist');
-      deferred.reject();
-    }
-  });
-  return deferred.promise;
-};
-
-/**
- * Checks if a config.xml file exists
- *
- * @return {Promise} resolves if exists, rejects otherwise
- */
-var configFileExists = function () {
-  var deferred = Q.defer();
-  fs.exists(settings.CONFIG_FILE, function (exists) {
-    if (exists) {
-      display.success(settings.CONFIG_FILE + ' exists');
-      deferred.resolve();
-    } else {
-      display.error('cordova\'s ' + settings.CONFIG_FILE + ' does not exist');
-      deferred.reject();
-    }
-  });
-  return deferred.promise;
-};
 
 display.header('Checking Project & Splash');
 
 atLeastOnePlatformFound()
-.then(validSplashExists)
-.then(configFileExists)
-.then(getProjectName)
-.then(getPlatforms)
-.then(generateSplashes)
-.catch(function (err) {
-  if (err) {
-    console.log(err);
-  }
-}).then(function () {
-  console.log('');
-});
+	.then(getProjectName)
+	.then(getPlatforms)
+	.then(generateSplashes)
+	.catch(function (err) {
+		if (err) {
+			console.log(err);
+		}
+	}).then(function () {
+		console.log('');
+	});
