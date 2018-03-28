@@ -146,7 +146,7 @@ var getProjectName = function () {
 var generateSplash = function (platform, splash) {
   var deferred = Q.defer();
   var srcPath = 'splash-' + platform.name + '.png'
-  if (!fs.existsSync(platformPath)) {
+  if (!fs.existsSync(srcPath)) {
 		display.error(srcPath + " not found")
 		deferred.resolve()
 		return
